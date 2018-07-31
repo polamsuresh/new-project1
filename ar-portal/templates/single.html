@@ -1,0 +1,385 @@
+{% extends 'main.html' %}
+{% block container %}
+  <!--content-->
+  <div class="content">
+ 
+    <!--single-->
+    <div>
+      <div class="container">
+        <div class="single-grids">
+          <div class="col-md-12 single-grid">
+            <div clas="single-top">
+          
+              <div class="single-left">
+                <style>
+                  .image-container {
+                    height: 800px;
+                    position: relative;
+                  }
+
+                  .image-container > img {
+                    width: 100%;
+                    height: 100%;
+                  }
+                </style>
+                <div class="col-md-12">
+                  <div class="row" style="margin: 10px">
+                 
+                  
+				   <div class="women">
+				 
+				   		
+                 
+                 
+                  <script>
+                  function myFunc(){
+                      debugger;
+                	  $("#wait").css("display", "block");
+                	 
+                	$('#myCarousel1').attr('disabled', true);
+                	 $("#product_next").removeAttr("href");
+               	  $("#product_previous").removeAttr("href");
+                	 
+                	  var badImage = document.getElementById("myImageShow").onclick = null;
+                	                	  
+                	  let $modelImage = $(".carousel-inner>.item>.row-fluidUpper>.span3>img");
+                	 
+                      let form = new FormData();
+                      let file = document.getElementById("form1").files[0];
+                      console.log(file);
+                      form.append("file", file);
+                      let settings = {
+                          "async": true,
+                          "crossDomain": true,
+                          "url": "http://192.168.100.223:8080/api/artifact-handler/single/upload",
+                          "method": "POST",
+                          "mimeType": "multipart/form-data",
+                          "data": form,
+                          "processData": false,
+                          "contentType": false
+                      };
+                      $.ajax(settings).done(function (r) {
+                       	  $("#wait").css("display", "none");
+                    	  $('#myCarousel1').attr('disabled', false);
+                    	  $("#product_next").attr("href",'#myCarousel1');
+                    	  $("#product_previous").attr("href",'#myCarousel1');
+                    	
+                          let response = JSON.parse(r);
+                          console.log();
+                          console.log(response.link);
+                          $modelImage.attr("src", response.link);
+                          $modelImage.attr('data-original', response.link);
+                          $modelImage.attr("data-type", "uploaded");
+
+
+                            
+                           //code by waheed
+                            let final_request_data1 = {"type":"uploaded","v_path": response.link};
+                             $.ajax({
+                                  async: true,
+                                  type: 'POST',
+                                  url: 'http://192.168.100.17:1861/pose_parse',
+                                  data: JSON.stringify(final_request_data1),
+                                  success: function (data) {
+                                      console.log("pose_parse");
+                                    
+                                  },
+                                  contentType: "application/json",
+                                  dataType: 'json'
+                              });
+
+                      
+                          /*   $.ajax({
+                                  async: true,
+                                  type: 'POST',
+                                  url: 'http://192.168.100.17:1352/parse',
+                                  data: JSON.stringify(final_request_data1),
+                                  success: function (data) {
+                                      console.log("parse");
+                                    
+                                  },
+                                  contentType: "application/json",
+                                  dataType: 'json'
+                              });*/
+
+                            // code ends here
+                      });
+                      
+
+                  }
+                 
+                      $(document).ready(function () {
+                    	  
+                    	  document.getElementsByClassName("carousel-inner").onclick = null;
+                    	  
+                    	 // var badImage = document.getElementById("myImageShow").onclick = null;
+                    	  
+                    	  $( "#loading" ).hide();
+                    	  $('#wait').css('opacity', '0.5');
+                          let $modelImage = $(".carousel-inner>.item>.row-fluidUpper>.span3>img");
+                          
+                         
+
+                          let models = {{ models|safe }};
+
+                          let present_model = 0;
+                          $("#model_next").click(function () {
+                              console.log("next");
+                              console.log(models.length - 1);
+                              console.log(models.length);
+                              console.log(present_model);
+                              console.log(present_model < models.length - 1);
+                              if (present_model < models.length - 1) {
+                                  present_model++;
+                              } else {
+                                  present_model = 0;
+                              }
+                              $modelImage.attr("src", "/assets/model/" + models[present_model]);
+                              $modelImage.attr("data-image", models[present_model]);
+                              $modelImage.attr("data-type", "local");
+                          });
+
+                          $("#model_previous").click(function () {
+                              console.log("previous");
+                              if (present_model === 0) {
+                                  present_model = models.length - 1;
+                              } else {
+                                  present_model--;
+                              }
+                              $modelImage.attr("src", "/assets/model/" + models[present_model]);
+                              $modelImage.attr("data-image", models[present_model]);
+                              $modelImage.attr("data-type", "local");
+                          });
+
+                          $(".carousel-inner>.item>.row-fluid>.span3>img").click(function () {
+                        	  
+                        	  $("#wait").css("display", "block");
+                        	  
+                        	  
+                        	  
+                              console.log($(this).data("image"));
+
+                              let typeOfModel = $modelImage.attr("data-type");
+                              console.log(typeOfModel);
+                              let final_request_data = `{"type":"${typeOfModel}","v_path": "/home/jotter/Test_Images/model/${$modelImage.attr("data-image")}","p_path": "/home/jotter/Test_Images/product/${$(this).attr("data-image")}"}`;
+                              if (typeOfModel === 'uploaded') {
+                                  final_request_data = `{"type":"${typeOfModel}","v_path": "${$modelImage.attr("data-original")}","p_path": "/home/jotter/Test_Images/product/${$(this).attr("data-image")}"}`;
+                              }
+
+                              console.log(final_request_data);
+                              $.ajax({
+                                  type: 'POST',
+                                  url: 'http://192.168.100.17:1111/virtual_kart',
+                                  data: final_request_data,
+                                  success: function (data) {
+                                      console.log(data);
+                                      $(".carousel-inner>.item>.row-fluidUpper>.span3>img").attr("src", data.result_path);
+                                      $("#wait").css("display", "none");
+                                      
+                                  },
+                                  contentType: "application/json",
+                                  dataType: 'json'
+                              });
+                          });
+
+                          let items = {{ items|safe }}
+                          let present_item = 2;
+
+                          let product = [$("#product_1"), $("#product_2"), $("#product_3")];
+
+                          $("#product_next").click(function () {
+                              console.log("product next");
+                              for (let i = 0; i < 3; i++) {
+                                  console.log(present_item + 1);
+                                  if (present_item === items.length - 1) {
+                                      present_item = 0;
+                                  }
+                                  product[i].attr("src", "/assets/product/" + items[++present_item]);
+                                  product[i].attr("data-image", items[present_item]);
+                              }
+                          });
+
+                          $("#product_previous").click(function () {
+                              console.log("product previous");
+                              for (let i = 2; i >= 0; i--) {
+                                  console.log(present_item);
+                                  if (present_item === 0) {
+                                      present_item = items.length - 1;
+                                  }
+                                  product[i].attr("src", "/assets/product/" + items[--present_item]);
+                                  product[i].attr("data-image", items[present_item]);
+                              }
+                          });
+                          
+                          let c_items = {{ c_items|safe }}
+
+                      });
+                  </script>
+                </div>
+               
+							  
+				
+					<div class="row">
+						<div class="span12" style="padding-top:2%;">
+				    	   
+				                <div id="myCarousel" class="carousel slide">
+				                
+				                
+				                 
+			
+                    
+                    
+				                <!-- Carousel items -->
+				                <div class="carousel-inner">
+				                   
+				                      {% for model in models %}
+				                        {% if loop.index == 1 %} 
+				                        <div class="item active">
+				                        {% else %}
+				                        <div class="item">
+				                        {% endif %}
+				                <div class="row-fluid1 row-fluidUpper">
+				                
+				                	
+				                	  <div class="span3 col-md-12"> <img id="topImage" class="img-thumbnail" style="width: 530px;height: 543px;" data-image="{{ model }}" data-type="local"
+                                 id="model_{{ model | replace(".", "_") }}"
+                                 src="{{ url_for('asset', item="model/"+model) }}" " alt="{{ model }}"></div>
+				                	
+				               
+				                	
+                       	</div><!--/row-fluid-->
+				                </div><!--/item-->
+				                   
+                      {% endfor %}
+				                 
+				                </div><!--/carousel-inner-->
+				                 
+				              <!--    <a id="model_previous" class="left carousel-control" href="#myCarousel" data-slide="prev">&lt; </a>
+				                <a id="model_next" class="right carousel-control" href="#myCarousel" data-slide="next">&gt; </a>-->
+				                </div><!--/myCarousel-->
+				                 
+				              
+						</div>
+					</div>
+
+
+                    
+                  </div>
+                </div>
+
+            
+            
+
+          </div>
+
+    <!-- Page Loader -->
+ 
+<div id="wait" style="display:none;    width: 100px;
+    height: 100px;
+    position: absolute;
+    z-index:1000;
+    top:-28%;
+    bottom: 0;
+    left: 22%;
+    right: 95%;
+
+
+    margin: auto;"><img id="myImageShow" src="./images/AggressiveGrouchyHammerkop-max-1mb.gif" width="64" height="64"><br>Loading..</div>
+
+    <!-- #END# Page Loader -->
+          <div></div>
+        </div>
+
+                    <div class="single-right simpleCart_shelfItem">
+								
+							<div class="col-md-12">
+                  <div class="row">
+				   <div class="col-md-4"></div>
+				   		<div class="col-md-4">
+				   		 <div class="choose_file">
+							<button  type="button"  name="button" class="my-cart-b item_add" style="margin-left: 3rem;">Upload</button>
+							    <input  onchange="myFunc()" id="form1"  name="img" type="file" accept="image/*" />
+							</div>
+            </div>
+            <div class="col-md-4">
+				   		 <!--  -->
+				   		 
+				   		
+				   		
+				   </div>
+                  </div>
+              </div>
+            
+
+                              <div class="col-md-12">
+                <!--   <div id="product_images" class="row">
+                    {% for item in items %}
+                      {% if loop.index < 4 %}
+                        <div class="col-md-4">
+                          <div class="image-container" style="height: 180px;">
+                            <img data-image="{{ item }}" id="product_{{ loop.index }}"
+                                 src="{{ url_for('asset', item="product/"+item) }}"
+                                 class="img-thumbnail img-responsive" alt="{{ item }}">
+                          </div>
+                        </div>
+                      {% endif %}
+                    {% endfor %}
+                  </div> -->
+                                      	<div class="row">
+		<div class="span12" style="padding-top:2%;">
+    	   
+                <div id="myCarousel1" class="carousel slide">
+                 
+               
+                <!-- Carousel items -->
+                <div class="carousel-inner">
+                {% for items in c_items %}
+                      
+             		  {% if loop.index == 1 %} 
+                        <div class="item active">
+                        {% else %}
+                        <div class="item">
+                        {% endif %}
+                	<div class="row-fluid">
+                    {% for item in items %}
+                    
+                	  <div class="span3 col-md-4">
+                	    {{ item }}
+                	  <img title="{{ item }}" data-image="{{ item }}" id="product_{{ loop.index }}"
+                                 src="{{ url_for('asset', item="product/"+item) }}" height="120px"
+                                 class="img-thumbnail img-responsive" alt="{{ item }}">
+                	  </div>
+                	   {% endfor %} 
+                	
+                	</div><!--/row-fluid-->
+                </div><!--/item-->
+                 
+                  {% endfor %} 
+             
+                 
+                </div><!--/carousel-inner-->
+                 
+                <a id="product_previous" class="left carousel-control" href="#myCarousel1" data-slide="prev">&lt; </a>
+                <a id="product_next" class="right carousel-control" href="#myCarousel1" data-slide="next">&gt; </a>
+                </div><!--/myCarousel-->
+                 
+              
+		</div>
+	</div>
+                </div>
+                <div class="col-md-12">
+                  <div class="row" style="margin: 10px">
+
+                    
+                  </div>
+                </div>
+                <div class="col-md-12"><img class="img-responsive" src="static/images/bs11.jpg"></div>
+              </div>
+            
+            
+              <div class="clearfix"></div>
+            </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

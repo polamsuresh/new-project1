@@ -1,0 +1,27 @@
+stages:
+  - package
+  - deploy
+
+variables:
+  SERVICE_NAME: ar-portal
+  SERVICE_PORT: 5000
+  PUBLISH_PORT: 5000
+  DOCKER_IMAGE: asia.gcr.io/jotter-global/ar-portal:$CI_PIPELINE_ID
+
+package:
+  stage: package
+  script:
+    - docker build -t "$DOCKER_IMAGE" .
+    - docker push "$DOCKER_IMAGE"
+  only:
+    - master
+
+deploy:
+  tags:
+    - GPU
+  stage: deploy
+  script:
+    - echo deploy
+    - docker-compose up -d
+  only:
+    - master

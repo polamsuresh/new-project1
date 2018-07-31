@@ -1,0 +1,30 @@
+{% extends 'main.html' %}
+
+{% block container %}
+  <div class="row">
+    <div class="col-md-6">
+      {% for _,item in items %}
+        <div class="row">
+          <div class="col-md-3">
+            <a href="{{ url_for('asset', item="product/"+item) }}">
+              <img class="rounded mx-auto img-thumbnail"
+                   src="{{ url_for('asset', item="product/"+item) }}">
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    <div class="col-md-6">
+      {% for _,item in models %}
+        <div class="row">
+          <div class="col-md-3">
+            <a href="{{ url_for('asset', item="model/"+item) }}">
+              <img class="rounded mx-auto img-thumbnail"
+                   src="{{ url_for('asset', item="model/"+item) }}">
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endblock %}
