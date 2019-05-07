@@ -3,6 +3,6 @@ services:
   ar-portal:
     image: ar-project:latest
     volumes:
-      - /home/chandrasekharpati/Downloads/OneDrive_2018-07-25/ar-portal/images:/opt/images
+      - /home/sureshpolam/Downloads/OneDrive_2018-07-25/ar-portal/images:/opt/images
     ports:
       - 5000:5000
